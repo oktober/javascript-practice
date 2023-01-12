@@ -15,8 +15,8 @@ Cash Register
 
 function checkCashRegister(price, cash, cid) {
 
-    // each currency's value in pennies
-    const currencyInPennies = {
+    // each currency's value in cents
+    const currencyInCents = {
       "ONE HUNDRED": 10000,
       "TWENTY": 2000,
       "TEN": 1000,
@@ -29,20 +29,20 @@ function checkCashRegister(price, cash, cid) {
     };
 
   // convert `price` and `cash` to ints for math to work properly
-  const priceInPennies = parseInt((price * 100).toFixed());
-  const cashInPennies = parseInt((cash * 100).toFixed());
+  const priceInCents = parseInt((price * 100).toFixed());
+  const cashInCents = parseInt((cash * 100).toFixed());
 
   // calculate the total amount of change to return
-  const returnChangeInPennies = cashInPennies - priceInPennies;
+  const returnChangeInCents = cashInCents - priceInCents;
 
-  // variable to hold the returnChangeInPennies that we can modify
-  let updatedReturnChange = returnChangeInPennies;
+  // variable to hold the returnChangeInCents that we can modify
+  let updatedReturnChange = returnChangeInCents;
 
   // array to store change to return
   const changeArray = [];
 
   // variable to hold the sum of all amounts in changeArray
-  let changeTotalInPennies = 0;
+  let changeTotalInCents = 0;
 
   // go through each currency in cid in reverse (from highest currency to lowest)
   for (let i = cid.length-1; i >=0; i--) {
@@ -50,53 +50,50 @@ function checkCashRegister(price, cash, cid) {
     let cidCurrencyName = cid[i][0];
     let cidCurrencyAmount = cid[i][1];
 
-    // convert this currency's amount to pennies (for proper maths)
-    let cidCurrencyAmountInPennies = parseInt((cidCurrencyAmount * 100).toFixed());
+    // convert this currency's amount to cents (for proper maths)
+    let cidCurrencyAmountInCents = parseInt((cidCurrencyAmount * 100).toFixed());
 
     // get the value of 1 of this currency
-    let SingleCurrencyValueInPennies = currencyInPennies[cidCurrencyName];
+    let SingleCurrencyValueInCents = currencyInCents[cidCurrencyName];
 
     // subtract one of this currency from updatedReturnChange
-    let difference = updatedReturnChange - SingleCurrencyValueInPennies;
+    let difference = updatedReturnChange - SingleCurrencyValueInCents;
 
     // if there's change available in this currency 
     // AND there's enough in updatedReturnChange for 1 of this currency
     if (cidCurrencyAmount > 0 && difference >= 0) {
         
         let numOfCurrency = 0;
-        let currencyAmountInPennies = 0;
+        let currencyAmountInCents = 0;
 
         // calculate how many of this currency we can return
         do {
-
           // give another unit of this currency for change
           numOfCurrency++;
 
           // calculate total amount used of this currency
-          currencyAmountInPennies = SingleCurrencyValueInPennies * numOfCurrency;
+          currencyAmountInCents = SingleCurrencyValueInCents * numOfCurrency;
 
           // remove 1 of this currency from the returnChange total
-          updatedReturnChange -= SingleCurrencyValueInPennies;
+          updatedReturnChange -= SingleCurrencyValueInCents;
 
           // amount left when we remove 1 of this currency from the returnChange total
-          difference = updatedReturnChange - SingleCurrencyValueInPennies;
+          difference = updatedReturnChange - SingleCurrencyValueInCents;
 
           // to loop again, see if we have enough in updatedReturnChange to give another unit of this currency
           // AND the amount we've given back is still less than what's available in cid
-        } while (difference >= 0 && currencyAmountInPennies < cidCurrencyAmountInPennies)
+        } while (difference >= 0 && currencyAmountInCents < cidCurrencyAmountInCents)
 
         // store the name & amount of that currency to return in ChangeArray 
-        changeArray.push([cidCurrencyName, currencyAmountInPennies / 100]);
+        changeArray.push([cidCurrencyName, currencyAmountInCents / 100]);
 
         // add the amount of this currency to the total of the change we can return
-        changeTotalInPennies += currencyAmountInPennies;
+        changeTotalInCents += currencyAmountInCents;
     }
-    
   }
 
   // if we can return the exact change
-  if (changeTotalInPennies === returnChangeInPennies) {
-
+  if (changeTotalInCents === returnChangeInCents) {
     // check if every currency in changeArray equal the currency in cid
     const changeIsEqual = changeArray.every( function(element) {
 
@@ -107,7 +104,6 @@ function checkCashRegister(price, cash, cid) {
       if (element[1] === amountInCID[1]) {
         return true;
       }       
-        
     });
 
     if (changeIsEqual) {
@@ -117,7 +113,6 @@ function checkCashRegister(price, cash, cid) {
       // currency in changeArray is > the currency in cid
       return { status: "OPEN", change: changeArray };
     }
-
   }
 
   // there's not enough change in the drawer to return
